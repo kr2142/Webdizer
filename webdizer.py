@@ -1,3 +1,5 @@
+#from bs4 import BeautifulSoup
+# -*- coding: utf-8 -*-
 from BeautifulSoup import BeautifulSoup
 import os
 import re
@@ -35,7 +37,8 @@ def grab_page(url, user_agent, flag, timestamp, save_to):
             link = tag.get('href',None)
             if link != None:
                 urls.append(link)
-                
+        #print page
+    
         if flag:
             grabbed_urls = open ('%s%s' % (directory, '\\grabbed_urls.txt'), 'a+')
             grabbed_urls.write('%s%s' % (url, '\n'))
@@ -56,6 +59,7 @@ def grab_page(url, user_agent, flag, timestamp, save_to):
         return urls, size
 
     except:
+        print 'error'
         pass
 
     
@@ -92,7 +96,9 @@ if __name__ == "__main__":
     walked_length = 0
     links_number = len(solution)
     big_chunk = []
-    for site in solution:
+    #for site in solution:
+    site = solution[0]
+    while True:
         walked = []
         walked.append(site)
         buff = []
@@ -123,6 +129,8 @@ if __name__ == "__main__":
                             continue
                         if ('//' != url_name[0:2]) and url_name[0] == '/':
                             url_name = '%s%s'%(start_url, url_name)
+                        elif get_site(url_name) == None:
+                            url_name = '%s%s%s'%(start_url, '/', url_name)
                         else:
                             continue
                 big_chunk.append(url_name)
@@ -136,10 +144,14 @@ if __name__ == "__main__":
                         total_data += data_amount
                         links_number += len(urls)
                         buff.extend(urls)
+                    except:
+                        print "--==##\nBad url: ", url_name
+                        continue
+                    try:
                         print url_name
                     except:
-                        print "--==##Bad url: ", url_name
-                        
+                        print "--==##Bad url"#, url_name
+                        continue
                     if len(url_name)>longest:
                         longest = len(url_name)
                         longest_link = url_name
@@ -166,7 +178,7 @@ if __name__ == "__main__":
     metrics.write("%-42s"%( "Amount of downloaded data:") +  str(total_data) + " bytes" + "\n")
     metrics.write("\n=====Link, times it is quoted=====\n")
     for item in counter.items():
-        metrics.write(str(item)+'\n')
+        metrics.write(str(item).encode('utf-8')+'\n')
     metrics.close()
 
     print ("Done!")    
